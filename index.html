@@ -492,7 +492,7 @@ function buildForm() {
       <div class="section-banner">
         <div class="icon">${section.icon}</div>
         <div class="titles">
-          <h2>${section.title} &middot; ${section.temperament}</h2>
+          <h2>${section.title}</h2>
           <p>Tick SA, A, D or SD for each statement.</p>
         </div>
       </div>
@@ -612,11 +612,11 @@ function showResults(scores) {
   resultsEl.classList.add('show');
   resultsEl.style.display = 'block';
 
-  requestAnimationFrame(() => {
+  setTimeout(() => {
     document.querySelectorAll('.bar-fill').forEach(el => {
       el.style.width = `${el.dataset.width}%`;
     });
-  });
+  }, 50);
 
   resultsEl.scrollIntoView({ behavior: 'smooth' });
 }
