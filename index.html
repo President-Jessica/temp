@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Four Temperaments Questionnaire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sanguine: #FF8C2E;
+    --sanguine-dark: #E85D04;
+    --sanguine-tint: #FFF1E0;
+    --sanguine-grad: linear-gradient(135deg, #FFB627, #FF6B35);
+
+    --choleric: #EF4444;
+    --choleric-dark: #C1121F;
+    --choleric-tint: #FDE8E8;
+    --choleric-grad: linear-gradient(135deg, #FF5A5F, #C1121F);
+
+    --melancholic: #6D5EF5;
+    --melancholic-dark: #4F3FE0;
+    --melancholic-tint: #EEECFF;
+    --melancholic-grad: linear-gradient(135deg, #8B7CFF, #4F46E5);
+
+    --phlegmatic: #06B6D4;
+    --phlegmatic-dark: #0891B2;
+    --phlegmatic-tint: #E0F9FC;
+    --phlegmatic-grad: linear-gradient(135deg, #22D3EE, #0891B2);
+
+    --bg: #F7F8FC;
+    --card: #ffffff;
+    --text: #17182B;
+    --muted: #61637A;
+    --border: #E7E8F2;
+    --ink: #17182B;
+    --shadow: 0 8px 24px rgba(23, 24, 43, 0.06);
+    --shadow-lg: 0 16px 40px rgba(23, 24, 43, 0.12);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding-bottom: 80px;
+  }
+
+  h1, h2, h3, .font-display { font-family: 'Fredoka', 'Inter', sans-serif; }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 56px 20px 42px;
+    text-align: center;
+    background:
+      radial-gradient(ellipse 60% 50% at 12% 15%, rgba(255,140,46,0.16), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 88% 12%, rgba(239,68,68,0.14), transparent 60%),
+      radial-gradient(ellipse 55% 55% at 85% 90%, rgba(109,94,245,0.14), transparent 60%),
+      radial-gradient(ellipse 55% 55% at 10% 92%, rgba(6,182,212,0.14), transparent 60%),
+      #ffffff;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero h1 {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 700;
+    margin: 0 0 10px;
+    background: linear-gradient(90deg, var(--sanguine-dark), var(--choleric), var(--melancholic), var(--phlegmatic-dark));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.01em;
+  }
+  .hero p.lead { color: var(--muted); max-width: 560px; margin: 0 auto 22px; font-size: 1.02rem; }
+
+  .swatch-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .swatch {
+    display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 8px;
+    border-radius: 999px; background: #fff; border: 1px solid var(--border);
+    font-size: 0.78rem; font-weight: 600; color: var(--text); box-shadow: var(--shadow);
+  }
+  .swatch .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .swatch.sanguine .dot { background: var(--sanguine-grad); }
+  .swatch.choleric .dot { background: var(--choleric-grad); }
+  .swatch.melancholic .dot { background: var(--melancholic-grad); }
+  .swatch.phlegmatic .dot { background: var(--phlegmatic-grad); }
+
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 16px; }
+
+  .id-fields {
+    display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+    margin: 26px 0 0;
+  }
+  .id-fields input {
+    padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px;
+    font-size: 0.95rem; min-width: 200px; background: #fff; font-family: inherit;
+    transition: border-color 150ms ease;
+  }
+  .id-fields input:focus { outline: none; border-color: var(--melancholic); }
+
+  .instructions {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 20px; margin: 22px 0; color: var(--muted); font-size: 0.95rem;
+    box-shadow: var(--shadow);
+  }
+  .instructions strong { color: var(--text); }
+
+  /* ---------- Sticky progress ---------- */
+  .progress-panel {
+    position: sticky; top: 0; z-index: 30;
+    background: rgba(247, 248, 252, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .progress-inner { max-width: 780px; margin: 0 auto; display: flex; align-items: center; gap: 14px; }
+  .progress-track {
+    flex: 1; height: 10px; background: #E7E8F2; border-radius: 999px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; width: 0%; border-radius: 999px;
+    background: linear-gradient(90deg, var(--sanguine), var(--choleric), var(--melancholic), var(--phlegmatic));
+    transition: width 250ms ease;
+  }
+  .progress-text { font-size: 0.82rem; font-weight: 700; color: var(--text); white-space: nowrap; min-width: 118px; text-align: right; }
+
+  /* ---------- Sections ---------- */
+  .section {
+    background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+    margin: 24px 0; box-shadow: var(--shadow); overflow: hidden;
+  }
+  .section-banner {
+    display: flex; align-items: center; gap: 12px; padding: 18px 22px;
+    color: #fff;
+  }
+  .sec-A .section-banner { background: var(--sanguine-grad); }
+  .sec-B .section-banner { background: var(--choleric-grad); }
+  .sec-C .section-banner { background: var(--melancholic-grad); }
+  .sec-D .section-banner { background: var(--phlegmatic-grad); }
+
+  .section-banner .icon {
+    width: 38px; height: 38px; flex-shrink: 0; border-radius: 12px;
+    background: rgba(255,255,255,0.22); display: flex; align-items: center; justify-content: center;
+  }
+  .section-banner .icon svg { width: 22px; height: 22px; stroke: #fff; }
+  .section-banner .titles h2 { margin: 0; font-size: 1.15rem; font-weight: 600; }
+  .section-banner .titles p { margin: 2px 0 0; font-size: 0.82rem; opacity: 0.92; }
+
+  .section-body { padding: 6px 22px 18px; }
+
+  .q-row {
+    display: grid; grid-template-columns: 1fr; gap: 12px;
+    padding: 16px 0; border-top: 1px solid var(--border);
+  }
+  .q-row:first-child { border-top: none; }
+  @media (min-width: 640px) {
+    .q-row { grid-template-columns: 1fr 264px; align-items: center; gap: 16px; }
+  }
+
+  .q-text { font-size: 0.96rem; line-height: 1.4; display: flex; gap: 10px; align-items: flex-start; }
+  .q-num {
+    flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--bg); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 700; color: var(--muted);
+  }
+
+  .q-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+  .pill {
+    display: flex; align-items: center; justify-content: center;
+    padding: 9px 4px; border-radius: 10px; border: 1.5px solid var(--border);
+    font-size: 0.8rem; font-weight: 700; color: var(--muted);
+    cursor: pointer; user-select: none; background: #fff;
+    transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 120ms ease, box-shadow 180ms ease;
+  }
+  .pill:hover { border-color: var(--section-color, var(--melancholic)); color: var(--section-color, var(--melancholic)); }
+
+  .sec-A .pill:hover { --section-color: var(--sanguine); }
+  .sec-B .pill:hover { --section-color: var(--choleric); }
+  .sec-C .pill:hover { --section-color: var(--melancholic); }
+  .sec-D .pill:hover { --section-color: var(--phlegmatic); }
+
+  input.opt-input:focus-visible + .pill { outline: 2px solid var(--melancholic); outline-offset: 2px; }
+
+  .sec-A input.opt-input:checked + .pill { background: var(--sanguine-grad); color: #fff; border-color: transparent; transform: scale(1.04); box-shadow: 0 4px 10px rgba(255,107,53,0.35); }
+  .sec-B input.opt-input:checked + .pill { background: var(--choleric-grad); color: #fff; border-color: transparent; transform: scale(1.04); box-shadow: 0 4px 10px rgba(193,18,31,0.35); }
+  .sec-C input.opt-input:checked + .pill { background: var(--melancholic-grad); color: #fff; border-color: transparent; transform: scale(1.04); box-shadow: 0 4px 10px rgba(79,70,229,0.35); }
+  .sec-D input.opt-input:checked + .pill { background: var(--phlegmatic-grad); color: #fff; border-color: transparent; transform: scale(1.04); box-shadow: 0 4px 10px rgba(8,145,178,0.35); }
+
+  .section-total {
+    display: flex; justify-content: flex-end; align-items: center; gap: 8px;
+    padding: 14px 22px 20px; font-size: 0.85rem; color: var(--muted); font-weight: 600;
+  }
+  .section-total span { font-weight: 800; color: var(--text); font-size: 0.95rem; }
+
+  /* ---------- Actions ---------- */
+  .actions { text-align: center; margin: 34px 0 10px; }
+  button#scoreBtn {
+    background: linear-gradient(90deg, var(--sanguine-dark), var(--choleric), var(--melancholic), var(--phlegmatic-dark));
+    color: #fff; border: none; padding: 16px 44px;
+    font-size: 1.05rem; border-radius: 999px; cursor: pointer; font-weight: 700;
+    font-family: 'Fredoka', sans-serif;
+    box-shadow: 0 10px 24px rgba(79,70,229,0.28);
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+  button#scoreBtn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(79,70,229,0.35); }
+  button#scoreBtn:active { transform: translateY(0); }
+  button#scoreBtn:disabled { background: #C7C9DA; cursor: not-allowed; box-shadow: none; transform: none; }
+
+  .missing-hint {
+    color: var(--choleric-dark); font-size: 0.85rem; text-align: center; margin-top: 14px;
+    display: none; font-weight: 600; background: var(--choleric-tint); border-radius: 10px;
+    padding: 10px 16px; max-width: 420px; margin-left: auto; margin-right: auto;
+  }
+
+  /* ---------- Results ---------- */
+  #results { display: none; }
+  #results.show { display: block; animation: fadeUp 500ms ease both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+  .result-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+    padding: 28px; margin-bottom: 22px; box-shadow: var(--shadow-lg);
+  }
+  .result-card h2 { margin: 0 0 20px; font-size: 1.3rem; }
+
+  .bars { display: flex; flex-direction: column; gap: 16px; margin: 4px 0 6px; }
+  .bar-row { display: grid; grid-template-columns: 118px 1fr 56px; align-items: center; gap: 12px; }
+  .bar-label { font-size: 0.9rem; font-weight: 700; }
+  .bar-track { background: #EEEFF7; border-radius: 999px; height: 18px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; width: 0%; transition: width 900ms cubic-bezier(.22,.9,.36,1); }
+  .bar-fill.A { background: var(--sanguine-grad); }
+  .bar-fill.B { background: var(--choleric-grad); }
+  .bar-fill.C { background: var(--melancholic-grad); }
+  .bar-fill.D { background: var(--phlegmatic-grad); }
+  .bar-score { text-align: right; font-size: 0.88rem; color: var(--muted); font-weight: 700; }
+
+  .verdict {
+    border-radius: 16px; padding: 22px 24px; margin-top: 20px; color: #fff;
+    background: var(--melancholic-grad);
+  }
+  .verdict.A { background: var(--sanguine-grad); }
+  .verdict.B { background: var(--choleric-grad); }
+  .verdict.C { background: var(--melancholic-grad); }
+  .verdict.D { background: var(--phlegmatic-grad); }
+  .verdict .eyebrow { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.85; font-weight: 700; }
+  .verdict .dom-name { font-family: 'Fredoka', sans-serif; font-size: 1.7rem; font-weight: 700; margin: 4px 0 8px; }
+  .verdict .dom-desc { opacity: 0.95; margin-bottom: 4px; line-height: 1.45; }
+  .verdict .blend {
+    font-size: 0.9rem; margin-top: 14px; background: rgba(255,255,255,0.18);
+    padding: 12px 16px; border-radius: 12px; line-height: 1.45;
+  }
+
+  .temperament-guide {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 4px;
+  }
+  @media (max-width: 560px) { .temperament-guide { grid-template-columns: 1fr; } }
+  .guide-card {
+    border-radius: 14px; padding: 16px; border: 1px solid var(--border); font-size: 0.88rem;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .guide-card .icon {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .guide-card .icon svg { width: 20px; height: 20px; stroke: #fff; }
+  .guide-card.A .icon { background: var(--sanguine-grad); }
+  .guide-card.B .icon { background: var(--choleric-grad); }
+  .guide-card.C .icon { background: var(--melancholic-grad); }
+  .guide-card.D .icon { background: var(--phlegmatic-grad); }
+  .guide-card h3 { margin: 0 0 4px; font-size: 0.95rem; }
+  .guide-card p { margin: 0; color: var(--muted); line-height: 1.4; }
+
+  .retake { text-align: center; margin-top: 26px; }
+  .retake button {
+    background: #fff; border: 1.5px solid var(--border); padding: 12px 26px;
+    border-radius: 999px; cursor: pointer; color: var(--text); font-size: 0.9rem; font-weight: 700;
+    font-family: 'Fredoka', sans-serif;
+    transition: border-color 150ms ease, color 150ms ease;
+  }
+  .retake button:hover { border-color: var(--melancholic); color: var(--melancholic); }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.78rem; margin: 40px auto 0; max-width: 640px; padding: 0 16px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+  <div class="hero">
+    <div class="swatch-row">
+      <span class="swatch sanguine"><span class="dot"></span>Sanguine</span>
+      <span class="swatch choleric"><span class="dot"></span>Choleric</span>
+      <span class="swatch melancholic"><span class="dot"></span>Melancholic</span>
+      <span class="swatch phlegmatic"><span class="dot"></span>Phlegmatic</span>
+    </div>
+    <h1>Four Temperaments Questionnaire</h1>
+    <p class="lead">Answer 40 quick statements and discover whether you're Sanguine, Choleric, Melancholic, or Phlegmatic — with your full score breakdown.</p>
+  </div>
+
+  <div class="wrap">
+    <div class="id-fields">
+      <input type="text" id="userName" placeholder="Name">
+      <input type="date" id="userDate">
+    </div>
+
+    <div class="instructions">
+      <strong>Instructions:</strong> For each statement, choose the option that best describes you —
+      <strong>SA</strong> (Strongly Agree), <strong>A</strong> (Agree), <strong>D</strong> (Disagree), or <strong>SD</strong> (Strongly Disagree).
+      Answer all 40 statements, then tap "Calculate My Score" to see your result and interpretation.
+    </div>
+  </div>
+
+  <div class="progress-panel">
+    <div class="progress-inner">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-text" id="progress">0 of 40 answered</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <form id="quizForm"></form>
+
+    <div class="actions">
+      <button type="button" id="scoreBtn">Calculate My Score</button>
+      <div class="missing-hint" id="missingHint">Please answer every statement before calculating your score.</div>
+    </div>
+
+    <div id="results">
+      <div class="result-card">
+        <h2>Your Results</h2>
+        <div class="bars" id="bars"></div>
+        <div class="verdict" id="verdict"></div>
+      </div>
+
+      <div class="result-card">
+        <h2>Temperament Guide</h2>
+        <div class="temperament-guide">
+          <div class="guide-card A">
+            <div class="icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            </div>
+            <div><h3>Sanguine</h3><p>Sociable, optimistic, talkative, enthusiastic, enjoys variety.</p></div>
+          </div>
+          <div class="guide-card B">
+            <div class="icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1.2 3-2.6 4.2-2.6 8.2a2.6 2.6 0 005.2 0c0-1-.4-1.8-.9-2.6 1.8 1 3.6 2.8 3.6 5.4a6 6 0 11-12 0c0-4.4 3.4-6 3.4-8.2 0-1 .4-1.8 3.3-2.8z"/></svg>
+            </div>
+            <div><h3>Choleric</h3><p>Goal-oriented, decisive, confident, independent, strong leader.</p></div>
+          </div>
+          <div class="guide-card C">
+            <div class="icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M4 19.5A2.5 2.5 0 006.5 22H20V4H6.5A2.5 2.5 0 004 6.5v13z"/></svg>
+            </div>
+            <div><h3>Melancholic</h3><p>Analytical, thoughtful, organized, detail-oriented, reflective.</p></div>
+          </div>
+          <div class="guide-card D">
+            <div class="icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 019.5 6.2c3 0 8.1 2 10.1 8-1 3-4 5.8-8.6 5.8z"/><path d="M9.5 6.2c0 6 2 10.3 6.2 14.3"/></svg>
+            </div>
+            <div><h3>Phlegmatic</h3><p>Calm, patient, cooperative, reliable, peace-loving.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="retake">
+        <button type="button" id="retakeBtn">Retake Questionnaire</button>
+      </div>
+    </div>
+
+    <footer>
+      Educational Note: This historical Four Temperaments questionnaire is for educational discussion only
+      and is not a scientifically validated psychological assessment.
+    </footer>
+  </div>
+
+<script>
+const SECTIONS = [
+  {
+    key: 'A',
+    title: 'Section A',
+    temperament: 'Sanguine',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+    questions: [
+      "I enjoy meeting new people.",
+      "I easily make friends.",
+      "I enjoy being the center of attention.",
+      "I am enthusiastic and energetic.",
+      "I like trying new experiences.",
+      "I express my emotions openly.",
+      "People describe me as cheerful.",
+      "I enjoy entertaining others.",
+      "I become excited quickly.",
+      "I prefer fun over routine."
+    ]
+  },
+  {
+    key: 'B',
+    title: 'Section B',
+    temperament: 'Choleric',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1.2 3-2.6 4.2-2.6 8.2a2.6 2.6 0 005.2 0c0-1-.4-1.8-.9-2.6 1.8 1 3.6 2.8 3.6 5.4a6 6 0 11-12 0c0-4.4 3.4-6 3.4-8.2 0-1 .4-1.8 3.3-2.8z"/></svg>',
+    questions: [
+      "I enjoy taking charge.",
+      "I make decisions quickly.",
+      "I like setting goals.",
+      "I enjoy competition.",
+      "I remain determined despite challenges.",
+      "People see me as confident.",
+      "I enjoy solving problems.",
+      "I like being in control of situations.",
+      "I am ambitious.",
+      "I work hard to achieve success."
+    ]
+  },
+  {
+    key: 'C',
+    title: 'Section C',
+    temperament: 'Melancholic',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M4 19.5A2.5 2.5 0 006.5 22H20V4H6.5A2.5 2.5 0 004 6.5v13z"/></svg>',
+    questions: [
+      "I pay attention to details.",
+      "I enjoy planning ahead.",
+      "I think carefully before acting.",
+      "I prefer organized environments.",
+      "I enjoy working independently.",
+      "I set high standards for myself.",
+      "I analyze situations deeply.",
+      "I appreciate structure and order.",
+      "I enjoy meaningful conversations.",
+      "I like completing tasks accurately."
+    ]
+  },
+  {
+    key: 'D',
+    title: 'Section D',
+    temperament: 'Phlegmatic',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 019.5 6.2c3 0 8.1 2 10.1 8-1 3-4 5.8-8.6 5.8z"/><path d="M9.5 6.2c0 6 2 10.3 6.2 14.3"/></svg>',
+    questions: [
+      "I remain calm under pressure.",
+      "I avoid unnecessary conflict.",
+      "People describe me as patient.",
+      "I enjoy helping others.",
+      "I adapt easily to changes.",
+      "I listen carefully before speaking.",
+      "I value peaceful relationships.",
+      "I am dependable.",
+      "I remain relaxed in most situations.",
+      "I prefer cooperation over competition."
+    ]
+  }
+];
+
+const OPTIONS = [
+  { label: 'SA', full: 'Strongly Agree', value: 4 },
+  { label: 'A',  full: 'Agree', value: 3 },
+  { label: 'D',  full: 'Disagree', value: 2 },
+  { label: 'SD', full: 'Strongly Disagree', value: 1 }
+];
+
+const DESCRIPTIONS = {
+  Sanguine: "Sociable, optimistic, talkative, enthusiastic, enjoys variety.",
+  Choleric: "Goal-oriented, decisive, confident, independent, strong leader.",
+  Melancholic: "Analytical, thoughtful, organized, detail-oriented, reflective.",
+  Phlegmatic: "Calm, patient, cooperative, reliable, peace-loving."
+};
+
+const TOTAL_QUESTIONS = SECTIONS.reduce((sum, s) => sum + s.questions.length, 0);
+let qCounter = 0;
+
+function buildForm() {
+  const form = document.getElementById('quizForm');
+  SECTIONS.forEach(section => {
+    const secDiv = document.createElement('div');
+    secDiv.className = `section sec-${section.key}`;
+
+    secDiv.innerHTML = `
+      <div class="section-banner">
+        <div class="icon">${section.icon}</div>
+        <div class="titles">
+          <h2>${section.title} &middot; ${section.temperament}</h2>
+          <p>Tick SA, A, D or SD for each statement.</p>
+        </div>
+      </div>
+    `;
+
+    const body = document.createElement('div');
+    body.className = 'section-body';
+
+    section.questions.forEach(qtext => {
+      qCounter++;
+      const qId = `q${qCounter}`;
+      const row = document.createElement('div');
+      row.className = 'q-row';
+
+      let optionsHtml = '';
+      OPTIONS.forEach(opt => {
+        const inputId = `${qId}-${opt.label}`;
+        optionsHtml += `
+          <input type="radio" class="opt-input sr-only" id="${inputId}" name="${qId}" value="${opt.value}" data-section="${section.key}">
+          <label class="pill" for="${inputId}" aria-label="${opt.full}">${opt.label}</label>
+        `;
+      });
+
+      row.innerHTML = `
+        <div class="q-text"><span class="q-num">${qCounter}</span><span>${qtext}</span></div>
+        <div class="q-options">${optionsHtml}</div>
+      `;
+      body.appendChild(row);
+    });
+
+    secDiv.appendChild(body);
+
+    const totalRow = document.createElement('div');
+    totalRow.className = 'section-total';
+    totalRow.innerHTML = `Section Total: <span id="total-${section.key}">0</span>&nbsp;/ 40`;
+    secDiv.appendChild(totalRow);
+
+    form.appendChild(secDiv);
+  });
+}
+
+function sectionStartIndex(sIdx) {
+  return SECTIONS.slice(0, sIdx).reduce((s, sec) => s + sec.questions.length, 0);
+}
+
+function updateProgress() {
+  const answered = new Set();
+  document.querySelectorAll('#quizForm input[type=radio]:checked').forEach(input => {
+    answered.add(input.name);
+  });
+  document.getElementById('progress').textContent = `${answered.size} of ${TOTAL_QUESTIONS} answered`;
+  document.getElementById('progressFill').style.width = `${(answered.size / TOTAL_QUESTIONS) * 100}%`;
+
+  SECTIONS.forEach((section, sIdx) => {
+    let total = 0;
+    section.questions.forEach((_, idx) => {
+      const qNum = sectionStartIndex(sIdx) + idx + 1;
+      const checked = document.querySelector(`input[name="q${qNum}"]:checked`);
+      if (checked) total += Number(checked.value);
+    });
+    document.getElementById(`total-${section.key}`).textContent = total;
+  });
+}
+
+function computeScores() {
+  const scores = {};
+  SECTIONS.forEach((section, sIdx) => {
+    let total = 0;
+    section.questions.forEach((_, idx) => {
+      const qNum = sectionStartIndex(sIdx) + idx + 1;
+      const checked = document.querySelector(`input[name="q${qNum}"]:checked`);
+      if (checked) total += Number(checked.value);
+    });
+    scores[section.key] = total;
+  });
+  return scores;
+}
+
+function showResults(scores) {
+  const maxScore = 40;
+  const bars = document.getElementById('bars');
+  bars.innerHTML = '';
+
+  const entries = SECTIONS.map(s => ({ key: s.key, temperament: s.temperament, score: scores[s.key] }));
+
+  entries.forEach(e => {
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <div class="bar-label">${e.temperament}</div>
+      <div class="bar-track"><div class="bar-fill ${e.key}" data-width="${(e.score / maxScore) * 100}" style="width:0%"></div></div>
+      <div class="bar-score">${e.score}/40</div>
+    `;
+    bars.appendChild(row);
+  });
+
+  const sorted = [...entries].sort((a, b) => b.score - a.score);
+  const top = sorted[0];
+  const second = sorted[1];
+  const isBlend = (top.score - second.score) <= 2 && second.score > 0;
+
+  const verdict = document.getElementById('verdict');
+  verdict.className = `verdict ${top.key}`;
+  let html = `
+    <div class="eyebrow">Your dominant temperament</div>
+    <div class="dom-name">${top.temperament}</div>
+    <div class="dom-desc">${DESCRIPTIONS[top.temperament]}</div>
+  `;
+  if (isBlend) {
+    html += `<div class="blend">Your scores for <strong>${top.temperament}</strong> (${top.score}) and
+      <strong>${second.temperament}</strong> (${second.score}) are close, suggesting a blended temperament —
+      you likely express traits of both. ${DESCRIPTIONS[second.temperament]}</div>`;
+  }
+  verdict.innerHTML = html;
+
+  const resultsEl = document.getElementById('results');
+  resultsEl.classList.add('show');
+  resultsEl.style.display = 'block';
+
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.bar-fill').forEach(el => {
+      el.style.width = `${el.dataset.width}%`;
+    });
+  });
+
+  resultsEl.scrollIntoView({ behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildForm();
+  document.getElementById('userDate').valueAsDate = new Date();
+
+  document.getElementById('quizForm').addEventListener('change', updateProgress);
+
+  document.getElementById('scoreBtn').addEventListener('click', () => {
+    const answered = new Set();
+    document.querySelectorAll('#quizForm input[type=radio]:checked').forEach(input => answered.add(input.name));
+    if (answered.size < TOTAL_QUESTIONS) {
+      document.getElementById('missingHint').style.display = 'block';
+      return;
+    }
+    document.getElementById('missingHint').style.display = 'none';
+    const scores = computeScores();
+    showResults(scores);
+  });
+
+  document.getElementById('retakeBtn').addEventListener('click', () => {
+    document.getElementById('quizForm').reset();
+    updateProgress();
+    const resultsEl = document.getElementById('results');
+    resultsEl.classList.remove('show');
+    resultsEl.style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>
